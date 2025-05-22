@@ -54,7 +54,7 @@ public class AuthService
         };
 
         _dbContext.Users.Add(user);
-        _dbContext.SaveChanges();
+        var newUser = _dbContext.SaveChanges();
 
         return GenerateToken(user.Email);
     }

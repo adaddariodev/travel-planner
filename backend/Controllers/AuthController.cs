@@ -17,7 +17,7 @@ public class AuthController : ControllerBase {
     if (request.Password != request.ConfirmPassword)
       return BadRequest("Le password non corrispondono.");
           
-      var response = _authService.GenerateToken(request.Email);
+      var response = _authService.Register(request);
       return Ok(response);
     }
 
