@@ -1,8 +1,12 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-
 var builder = WebApplication.CreateBuilder(args);
+
+//DB
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Aggiungi servizi JWT (configurazione semplificata ma completa)
 builder.Services.AddAuthentication(options => {
