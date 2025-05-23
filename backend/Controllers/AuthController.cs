@@ -11,20 +11,47 @@ public class AuthController : ControllerBase {
 
     [HttpPost("register")]
     public IActionResult Register([FromBody] RegisterRequest request) {
-    // TODO: Aggiungi logica registrazione utent
-    
-    //check password = password confirmation
-    if (request.Password != request.ConfirmPassword)
-      return BadRequest("Le password non corrispondono.");
-          
-      var response = _authService.Register(request);
-      return Ok(response);
+      try
+      {
+        var response = _authService.Register(request);
+        var cookieOptions = new CookieOptions
+        {
+            HttpOnly = true,
+            Secure = true, // Solo in produzione con HTTPS
+            SameSite = SameSiteMode.Strict,
+            Expires = DateTime.UtcNow.AddHours(3)
+        };
+        Response.Cookies.Append("auth-token", response.Token, cookieOptions);
+        return Ok(response);
+      }
+      catch (Exception ex)
+      {
+        return BadRequest(new { message = ex.Message });
+      }
     }
 
     [HttpPost("login")]
     public IActionResult Login([FromBody] LoginRequest request) {
-      // TODO: Verifica credenziali
-      var response = _authService.GenerateToken(request.Email);
-      return Ok(response);
+      try
+      {
+          var response = _authService.Login(request);
+          
+          // Stesso codice per i cookie:
+          var cookieOptions = new CookieOptions
+          {
+              HttpOnly = true,
+              Secure = true,
+              SameSite = SameSiteMode.Strict,
+              Expires = DateTime.UtcNow.AddHours(3)
+          };
+          
+          Response.Cookies.Append("auth-token", response.Token, cookieOptions);
+          
+          return Ok(response);
+      }
+      catch (Exception ex)
+      {
+          return BadRequest(new { message = ex.Message });
+      }
     }
 }
